@@ -1,0 +1,199 @@
+// import React, { useState, useRef, useEffect } from 'react'
+// import Head from 'next/head'
+// import Image from 'next/image';
+// import Chatbot from "../../public/images/chatbot.png"
+// import { motion } from 'framer-motion';
+// import axios from 'axios';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faArrowUp, faSpinner, faX } from '@fortawesome/free-solid-svg-icons';
+// import '@fortawesome/fontawesome-svg-core/styles.css';
+
+
+// export default function Home() {
+//     const [showChatbot, setShowChatbot] = useState(false);
+//     const chatbotRef = useRef(null);
+//     const chatLogContainerRef = useRef(null);
+
+//     const handleClick = () => {
+//         setShowChatbot(!showChatbot);
+//     };
+
+//     const textAreaRef = useRef(null);
+//     const [val, setVal] = useState("");
+//     const handleChange = (e) => {
+//         setVal(e.target.value);
+//     }
+//     useEffect(() => {
+//         if (textAreaRef.current) {
+//             textAreaRef.current.style.height = "auto";
+//             textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+//         }
+//     }, [val, textAreaRef.current]);
+
+//     const [inputValue, setInputValue] = useState('');
+//     const [chatlog, setChatLog] = useState([]);
+//     const [isLoading, setIsLoading] = useState(false);
+
+//     const handleSubmit = (event) => {
+//         event.preventDefault();
+
+//         setChatLog((prevChatLog) => [...prevChatLog, { type: 'user', message: inputValue }])
+
+//         sendMessage(inputValue);
+
+//         setInputValue('');
+//     }
+
+//     const sendMessage = (message) => {
+//         const url = 'https://api.openai.com/v1/chat/completions';
+//         const headers = {
+//             'Content-type': 'application/json',
+//             'Authorization': `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`
+//         };
+//         const data = {
+//             model: "gpt-3.5-turbo-0301",
+//             messages: [{ "role": "user", "content": message }]
+//         };
+
+//         setIsLoading(true);
+
+//         axios.post(url, data, { headers: headers }).then((response) => {
+//             console.log(response);
+//             setChatLog((prevChatLog) => [...prevChatLog, { type: 'bot', message: response.data.choices[0].message.content }])
+//             setIsLoading(false);
+//         }).catch((error) => {
+//             setIsLoading(false);
+//             console.log(error);
+//         })
+
+//     }
+
+//     useEffect(() => {
+
+//         if (chatLogContainerRef.current) {
+//             chatLogContainerRef.current.scrollTop = chatLogContainerRef.current.scrollHeight;
+//         }
+//     }, [chatlog]);
+
+//     return (
+//         <>
+//             <Head>
+//                 <title>AJM</title>
+//                 <meta name="Miro Productions" content="Welcome to my webpage! Discover my impact with code 😄" />
+//             </Head>
+
+
+//             <main className='flex items-center text-dark w-full min-h-screen dark:text-light'>
+
+//                 <div
+//                     className="right-8 bottom-8 inline-block w-20 fixed"
+//                     onClick={handleClick}
+//                 >
+//                     <Image src={Chatbot} alt="chatbot" className="w-full h-auto cursor-pointer" />
+//                 </div>
+
+//                 {showChatbot && (
+//                     <motion.div
+//                         initial={{ scale: 0, opacity: 0, x: '-50%', y: '-50%' }}
+//                         animate={{ scale: 1, opacity: 1 }}
+//                         ref={chatbotRef}
+//                         className="min-w-[90vw] max-h-[80vh] h-auto flex flex-col justify-between z-30 items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-dark/90 dark:bg-light/75 rounded-xl backdrop-blur-md"
+//                     >
+
+//                         <div className='w-full h-full m-0 p-0 flex flex-col justify-center items-center rounded-xl overflow-hidden'>
+//                             {isLoading &&
+//                                 <div className='mt-5'><FontAwesomeIcon icon={faSpinner} spinPulse /></div>
+//                             }
+//                             <div
+//                                 ref={chatLogContainerRef}
+//                                 className='min-h-[40vh] max-h-[50vh] flex flex-col w-[95%] space-y-4 outline-1 h-full rounded-2xl m-3 p-2 overflow-y-auto bg-light dark:bg-dark '>
+//                                 {/* {
+//                                     chatlog.map((message, index) => (
+//                                         <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'
+//                                             }`}>
+//                                             <div className={`${message.type === 'user' ? 'bg-red-500' : 'bg-blue-500'
+//                                                 } rounded-lg p-4 text-white max-w-sm`}>
+//                                                 {message.message}
+//                                             </div>
+//                                         </div>
+//                                     ))
+//                                 } */}
+//                                 {
+//                                     chatlog.map((message, index) => (
+//                                         <div key={index} className={`flex flex-col ${message.type === 'user' ? 'justify-end' : 'justify-start'
+//                                             }`}>
+//                                             {message.type === 'user' ? (
+//                                                 <>
+//                                                     <div className="text-dark dark:text-light text-lg"><strong>You</strong></div>
+//                                                     <div className="rounded-lg p-1 text-dark dark:text-light max-w-sm">{message.message}</div>
+//                                                 </>
+//                                             ) : (
+//                                                 <>
+//                                                   <div className="text-dark dark:text-light text-lg"><strong>Paco</strong></div>
+//                                                     <div className="rounded-lg p-1 text-dark dark:text-light max-w-sm">{message.message}</div>
+//                                                 </>
+//                                             )}
+//                                         </div>
+//                                     ))
+//                                 }
+
+//                                 {/* <div className=' col-span-8 float-left my-3 mx-2'>
+//                                     <strong>You :</strong>
+//                                     <p className='dark:text-light'>
+
+//                                     </p>
+//                                 </div>
+
+
+
+//                                 <div className='col-spans-8 right-0 my-3 mx-2'>
+//                                     <strong>Paco :</strong>
+//                                     <p className='dark:text-light'>
+
+//                                     </p>
+//                                 </div> */}
+
+
+//                             </div>
+
+//                         </div>
+
+//                         <div className='w-full h-full m-3 p-0 flex flex-col justify-center items-center rounded-xl overflow-hidden'>
+//                             {/* <div className='max-h-[20vh] inline-flex flex-row justify-center items-center w-[95%] outline-1 h-full rounded-2xl m-3 p-2 text-left bg-light  dark:bg-dark '> */}
+
+//                             <form onSubmit={handleSubmit}
+//                                 className='max-h-[20vh] inline-flex flex-row justify-center items-center w-[95%] outline-1 h-full rounded-2xl m-3 mt-5 p-2 text-left bg-light dark:bg-dark '>
+//                                 <textarea
+//                                     type='text'
+//                                     ref={textAreaRef}
+//                                     value={inputValue}
+//                                     onChange={(e) => {
+//                                         setInputValue(e.target.value);
+//                                         handleChange(e);
+//                                     }}
+//                                     className="w-full h-auto max-h-[20vh] mx-3 items-center justify-center dark:text-light
+//                                     bg-transparent text-dark resize-none focus:outline-none border-none"
+//                                     placeholder="Hey! I'm Paco, Ask me anything 😄"
+//                                 />
+//                                 <button
+//                                     type='submit'
+//                                     className='bg-dark text-light dark:text-dark  dark:bg-light p-2 rounded-2xl hover:cursor-pointer'>
+//                                     <FontAwesomeIcon icon={faArrowUp} size='lg' className='faMagGlass' />
+
+//                                 </button>
+//                             </form>
+//                             {/* </div> */}
+//                             <button onClick={handleClick} className={`flex justify-center items-center text-center text-sm mb-4`}>
+//                                 <FontAwesomeIcon icon={faX} className='w-5 h-5 my-2 hover:shadow-xl p-2 rounded-full border border-solid text-light dark:text-dark border-light hover:shadow-light
+//                             dark:hover:shadow-lg dark:border-suedeGrey  hover:border-transparent dark:hover:border-transparent dark:bg-light/75 bg-dark' />
+//                             </button>
+//                         </div>
+
+
+
+//                     </motion.div>
+//                 )}
+//             </main>
+//         </>
+//     );
+// }
